@@ -1,13 +1,9 @@
 import React from "react";
-import axios from "axios";
+import { GET_CODE_URL } from "../constant";
 
 const Login = () => {
     const githubLogin = () => {
-        axios.get("/getLoginUrl").then(res => {
-            const { data } = res;
-            console.log(data);
-            window.location.href = data.url;
-        });
+        window.location.href = GET_CODE_URL;
     };
 
     return <button onClick={githubLogin}>깃허브로 로그인</button>;

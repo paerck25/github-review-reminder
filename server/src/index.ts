@@ -1,15 +1,12 @@
 import express from "express";
 import axios from "axios";
-import { CLIENT_ID, CLIENT_SECRET, githubLoginUrl } from "./github-api";
+require("dotenv").config();
 const app = express();
 const PORT = 4000;
+const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 app.use(express.json());
-
-app.get("/getLoginUrl", (req, res) => {
-  const url = githubLoginUrl();
-  res.send({ url });
-});
 
 app.post("/auth", async (req, res) => {
   if (req.body) {
@@ -27,7 +24,7 @@ app.post("/auth", async (req, res) => {
         },
       }
     );
-    return res.send({ accessToken: data });
+    return res.send({ data });
   }
 });
 
