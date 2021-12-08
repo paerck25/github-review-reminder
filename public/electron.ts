@@ -1,23 +1,27 @@
-const { app, BrowserWindow, Notification, Tray, Menu, nativeImage } = require("electron");
-const path = require("path");
-const isDev = require("electron-is-dev");
-const { ipcMain } = require("electron");
-ipcMain.on("asynchronous-message", (event, arg) => {
-    console.log("테스트", arg);
-    new Notification({ title: "테스트", body: arg }).show();
-    event.reply("asynchronous-reply", "pong");
-});
+import { app, BrowserWindow, Notification, ipcMain } from "electron";
+import * as isDev from "electron-is-dev";
+import * as path from "path";
+import axios from "axios";
 
-ipcMain.on("synchronous-message", (event, arg) => {
-    new Notification({ title: "테스트", body: arg }).show();
-    event.returnValue = "pong";
+ipcMain.on("auth", async (event, arg) => {
+    const { data } = await axios.post(
+        "https://github.com/login/oauth/access_token",
+        {
+            ...arg
+        },
+        {
+            headers: {
+                Accept: "application/json"
+            }
+        }
+    );
+    event.reply("access_code", data);
 });
 
 function createWindow() {
     const win = new BrowserWindow({
         webPreferences: {
             nodeIntegration: true,
-            enableRemoteModule: true,
             contextIsolation: false
         }
     });

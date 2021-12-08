@@ -3,13 +3,11 @@ import axios, { AxiosRequestConfig } from "axios";
 const BASE_URL = "https://api.github.com";
 
 const _apiGet = async (endpoint: string, config?: AxiosRequestConfig) => {
-    const { data } = await axios.get(BASE_URL + endpoint, config);
-    return data;
+    return await axios.get(BASE_URL + endpoint, config);
 };
 
 const _apiPost = async (endpoint: string, config?: AxiosRequestConfig) => {
-    const { data } = await axios.post(BASE_URL + endpoint, config);
-    return data;
+    return await axios.post(BASE_URL + endpoint, config);
 };
 
 export const getMyUserProfile = async () => {

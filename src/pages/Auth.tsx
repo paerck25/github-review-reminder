@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router";
 import queryString from "query-string";
 import axios from "axios";
 import { getMyUserProfile } from "../github-api";
+import { CLIENT_ID, CLIENT_SECRET } from "../constant";
+const electron = window.require("electron");
 
 type AccessToken = {
     access_token: string;
@@ -19,11 +21,10 @@ const Auth = () => {
         const query = queryString.parse(location.search);
         const code = query.code;
         if (code) {
-            getAccessToken(code as string).then(({ data }: { data: AccessToken }) => {
-                if (data) {
-                    localStorage.setItem("token", `${data.access_token}`);
-                    setToken(data.access_token);
-                }
+            electron.ipcRenderer.send("auth", { code: code, client_id: CLIENT_ID, client_secret: CLIENT_SECRET });
+            electron.ipcRenderer.on("access_code", (e: any, arg: AccessToken) => {
+                localStorage.setItem("token", `${arg.access_token}`);
+                setToken(arg.access_token);
             });
         } else {
             navigate("/", { replace: true });
