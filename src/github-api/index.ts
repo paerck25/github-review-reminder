@@ -1,16 +1,19 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { UserProfile } from "./types";
 
 const BASE_URL = "https://api.github.com";
 
 const _apiGet = async (endpoint: string, config?: AxiosRequestConfig) => {
-    return await axios.get(BASE_URL + endpoint, config);
+    const { data } = await axios.get(BASE_URL + endpoint, config);
+    return data;
 };
 
 const _apiPost = async (endpoint: string, config?: AxiosRequestConfig) => {
-    return await axios.post(BASE_URL + endpoint, config);
+    const { data } = await axios.post(BASE_URL + endpoint, config);
+    return data;
 };
 
-export const getMyUserProfile = async () => {
+export const getMyUserProfile = async (): Promise<UserProfile | undefined> => {
     const token = localStorage.getItem("token");
     return await _apiGet("/user", {
         headers: {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import queryString from "query-string";
-import axios from "axios";
 import { getMyUserProfile } from "../github-api";
 import { CLIENT_ID, CLIENT_SECRET } from "../constant";
 const electron = window.require("electron");
@@ -49,13 +48,6 @@ const Auth = () => {
                 });
         }
     }, [token]);
-
-    const getAccessToken = async (code: string) => {
-        const { data } = await axios.post("/auth", {
-            code: code
-        });
-        return data;
-    };
 
     return <h1>auth</h1>;
 };
