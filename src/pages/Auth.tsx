@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import queryString from "query-string";
-import { getMyUserProfile } from "../github-api";
 import { CLIENT_ID, CLIENT_SECRET } from "../constant";
+import styled from "styled-components";
+import LoadingSpinner from "../components/LoadingSpinner";
 const electron = window.require("electron");
 
 type AccessToken = {
@@ -14,7 +15,6 @@ type AccessToken = {
 const Auth = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [token, setToken] = useState("");
 
     useEffect(() => {
         const query = queryString.parse(location.search);
@@ -23,33 +23,28 @@ const Auth = () => {
             electron.ipcRenderer.send("auth", { code: code, client_id: CLIENT_ID, client_secret: CLIENT_SECRET });
             electron.ipcRenderer.on("access_code", (e: any, arg: AccessToken) => {
                 localStorage.setItem("token", `${arg.access_token}`);
-                setToken(arg.access_token);
+                navigate("/home", { replace: true });
             });
         } else {
+            localStorage.removeItem("token");
             navigate("/", { replace: true });
         }
     }, []);
 
-    useEffect(() => {
-        if (token) {
-            getMyUserProfile()
-                .then(res => {
-                    if (res) {
-                        console.log(res);
-                        navigate("/home", { replace: true });
-                    }
-                })
-                .catch(err => {
-                    if (err instanceof Error) {
-                        console.log(err.message);
-                        localStorage.removeItem("token");
-                        navigate("/", { replace: true });
-                    }
-                });
-        }
-    }, [token]);
-
-    return <h1>auth</h1>;
+    return (
+        <Container>
+            <LoadingSpinner />
+        </Container>
+    );
 };
 
 export default Auth;
+
+const Container = styled.div`
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+`;
