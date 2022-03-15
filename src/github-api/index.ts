@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { UserProfile } from "./types";
+import { OrganizaionInfo, UserProfile } from "./types";
 
 const BASE_URL = "https://api.github.com";
 
@@ -33,7 +33,7 @@ export const getMyUserProfile = async (): Promise<UserProfile | undefined> => {
     return await _apiGet("/user");
 };
 
-export const getMyOrganizationList = async () => {
+export const getMyOrganizationList = async (): Promise<OrganizaionInfo[]> => {
     return await _apiGet("/user/orgs");
 };
 
