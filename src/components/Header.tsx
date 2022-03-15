@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { UserProfile } from "../github-api/types";
+import { ReactComponent as GithubLogo } from "../assets/icons/github_logo_light.svg";
 const electron = window.require("electron");
 
 interface HeaderProps {
@@ -11,14 +12,13 @@ const Header = ({ userProfile }: HeaderProps) => {
     const openExternal = (href: string) => {
         electron.shell.openExternal(href);
     };
-
     return (
         <Container>
-            <LogoIcon
+            <GithubLogo onClick={() => openExternal(`https://github.com`)} />
+            <UserAvatar
                 src={userProfile.avatar_url}
                 onClick={() => openExternal(`https://github.com/${userProfile.login}`)}
             />
-            <UserAvatar src={userProfile.avatar_url} />
         </Container>
     );
 };
@@ -33,14 +33,8 @@ const Container = styled.div`
     padding: 16px;
 `;
 
-const LogoIcon = styled.img`
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-`;
-
 const UserAvatar = styled.img`
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
 `;
