@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { GET_CODE_URL } from "../constant";
 import { ReactComponent as GithubLogo } from "../assets/icons/github_logo_light.svg";
+import Carousel from "../components/Carousel";
 
 const Login = () => {
     const githubLogin = () => {
@@ -10,8 +11,7 @@ const Login = () => {
 
     return (
         <Container>
-            <Title>리뷰 좀 해주세요.</Title>
-            <Description>{`팀원이 풀리퀘스트를 올렸는데\n바빠서 미루고 까먹은적 있지않나요?`}</Description>
+            <Carousel />
             <LoginButton onClick={githubLogin}>
                 <LogoWrap>
                     <GithubLogo />
@@ -31,20 +31,6 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-`;
-
-const Title = styled.div`
-    color: #24292f;
-    font-weight: bold;
-    font-size: 36px;
-    margin-bottom: 12px;
-`;
-
-const Description = styled.div`
-    color: #24292f;
-    font-size: 20px;
-    margin-bottom: 20px;
-    white-space: pre-wrap;
 `;
 
 const LogoWrap = styled.div`
