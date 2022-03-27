@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import styled, { css } from "styled-components";
 import useThrottle from "../hooks/useThrottle";
 import { ReactComponent as RightArrowIcon } from "../assets/icons/right-arrow.svg";
@@ -11,23 +11,26 @@ const Carousel = ({ children }: CarouselProps) => {
     const [page, setPage] = useState(0);
     const CARD_LENGTH = React.Children.toArray(children).length;
 
+    const hasPrevPage = useMemo(() => page > 0, [page]);
+    const hasNextPage = useMemo(() => page < CARD_LENGTH - 1, [page, CARD_LENGTH]);
+
     const next = useThrottle(() => {
-        if (page === CARD_LENGTH - 1) return;
+        if (!hasNextPage) return;
         setPage(prev => prev + 1);
     }, 400);
 
     const prev = useThrottle(() => {
-        if (page === 0) return;
+        if (!hasPrevPage) return;
         setPage(prev => prev - 1);
     }, 400);
 
     return (
         <Container>
-            <LeftArrow hasPrevPage={page === 0} onClick={prev} />
+            <LeftArrow $hasPrevPage={hasPrevPage} onClick={prev} />
             <ViewPort>
                 <CardTrack page={page}>{children}</CardTrack>
             </ViewPort>
-            <RightArrow hasNextPage={page === CARD_LENGTH - 1} onClick={next} />
+            <RightArrow $hasNextPage={hasNextPage} onClick={next} />
         </Container>
     );
 };
@@ -58,31 +61,31 @@ const ArrowBase = styled(RightArrowIcon)`
     width: 30px;
     height: 30px;
     cursor: pointer;
-    .st0 {
+    .fill_color {
         fill: #24292f;
     }
 `;
 
-const LeftArrow = styled(ArrowBase)<{ hasPrevPage: boolean }>`
+const LeftArrow = styled(ArrowBase)<{ $hasPrevPage: boolean }>`
     margin-right: 50px;
     transform: rotate(180deg);
     ${props =>
-        props.hasPrevPage &&
+        !props.$hasPrevPage &&
         css`
             cursor: not-allowed;
-            .st0 {
+            .fill_color {
                 fill: #e5e8eb;
             }
         `}
 `;
 
-const RightArrow = styled(ArrowBase)<{ hasNextPage: boolean }>`
+const RightArrow = styled(ArrowBase)<{ $hasNextPage: boolean }>`
     margin-left: 50px;
     ${props =>
-        props.hasNextPage &&
+        !props.$hasNextPage &&
         css`
             cursor: not-allowed;
-            .st0 {
+            .fill_color {
                 fill: #e5e8eb;
             }
         `}
