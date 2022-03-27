@@ -46,9 +46,7 @@ const Home = () => {
     }, [pullRequests, myUserProfile]);
 
     useEffect(() => {
-        if (reviews.length > 0) {
-            electron.ipcRenderer.send("review_notification", { review_count: reviews.length });
-        }
+        electron.ipcRenderer.send("review_notification", { review_count: reviews.length });
     }, [reviews]);
 
     const renderReviews = useMemo(
