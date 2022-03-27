@@ -68,6 +68,17 @@ electron_1.ipcMain.on("auth", function (event, arg) { return __awaiter(void 0, v
         }
     });
 }); });
+electron_1.ipcMain.on("review_notification", function (event, arg) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        if (arg.review_count === 0) {
+            return [2 /*return*/, electron_1.app.dock.setBadge("")];
+        }
+        electron_1.app.dock.bounce("informational");
+        electron_1.app.dock.setBadge("".concat(arg.review_count));
+        new electron_1.Notification({ title: "리뷰 요청 알림!", body: "\uB9AC\uBDF0\uB97C \uC6D0\uD558\uB294 PR\uC774 ".concat(arg.review_count, "\uAC1C \uC788\uC2B5\uB2C8\uB2E4.") }).show();
+        return [2 /*return*/];
+    });
+}); });
 function createWindow() {
     var win = new electron_1.BrowserWindow({
         webPreferences: {
@@ -94,7 +105,6 @@ electron_1.app.whenReady().then(function () {
         { label: "열기", type: "normal", click: createWindow },
         { label: "종료", type: "normal", click: function () { return electron_1.app.quit(); } }
     ]);
-    tray.setToolTip("This is my application.");
     tray.setContextMenu(contextMenu);
     createWindow();
 });

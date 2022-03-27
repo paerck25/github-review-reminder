@@ -20,6 +20,15 @@ ipcMain.on("auth", async (event, arg) => {
     event.reply("access_code", data);
 });
 
+ipcMain.on("review_notification", async (event, arg) => {
+    if (arg.review_count === 0) {
+        return app.dock.setBadge("");
+    }
+    app.dock.bounce("informational");
+    app.dock.setBadge(`${arg.review_count}`);
+    new Notification({ title: "리뷰 요청 알림!", body: `리뷰를 원하는 PR이 ${arg.review_count}개 있습니다.` }).show();
+});
+
 function createWindow() {
     const win = new BrowserWindow({
         webPreferences: {

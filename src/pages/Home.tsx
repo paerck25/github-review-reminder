@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 import styled from "styled-components";
 import ListItem from "../components/ListItem";
 import { fetchPullRequest, getMyUserProfile } from "../github-api";
+const electron = window.require("electron");
 
 export interface Review {
     org_name: string;
@@ -18,7 +19,6 @@ export interface Review {
 const Home = () => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const { data: myUserProfile } = useQuery("myUserProfile", getMyUserProfile);
-
     const { data: pullRequests } = useQuery("pullRequests", fetchPullRequest);
 
     useEffect(() => {
@@ -44,6 +44,12 @@ const Home = () => {
             setReviews(my_reviews);
         }
     }, [pullRequests, myUserProfile]);
+
+    useEffect(() => {
+        if (reviews.length > 0) {
+            electron.ipcRenderer.send("review_notification", { review_count: reviews.length });
+        }
+    }, [reviews]);
 
     const renderReviews = useMemo(
         () =>
