@@ -11,7 +11,7 @@ interface HeaderProps {
 const Header = ({ userProfile }: HeaderProps) => {
     return (
         <Container>
-            <GithubLogo onClick={openBrowser.bind(null, `https://github.com`)} />
+            <GithubIcon onClick={openBrowser.bind(null, `https://github.com`)} />
             <UserAvatar
                 src={userProfile.avatar_url}
                 onClick={openBrowser.bind(null, `https://github.com/${userProfile.login}`)}
@@ -30,8 +30,13 @@ const Container = styled.div`
     padding: 16px;
 `;
 
+const GithubIcon = styled(GithubLogo)`
+    cursor: pointer;
+`;
+
 const UserAvatar = styled.img`
     width: 24px;
     height: 24px;
     border-radius: 50%;
+    cursor: pointer;
 `;
