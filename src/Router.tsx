@@ -4,6 +4,7 @@ import Layout from "./components/Layout";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Logout from "./pages/Logout";
 
 const Router = () => {
     return (
@@ -13,6 +14,7 @@ const Router = () => {
                 <Route path="/home" element={<Home />} />
             </Route>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/logout" element={<Logout />} />
         </Routes>
     );
 };

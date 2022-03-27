@@ -94,19 +94,29 @@ function createWindow() {
     else {
         win.loadFile(path.join(__dirname, "../build/index.html"));
     }
+    return win;
     // const icon = nativeImage.createFromPath(path.join(__dirname, "ICON_PATH"));
     // app.dock.setIcon(icon);
 }
 electron_1.app.whenReady().then(function () {
+    var win = createWindow();
     var icon = electron_1.nativeImage.createFromPath(path.join(__dirname, "assets/icons/notification_32x32.png"));
     var resizedIcon = icon.resize({ width: 16, height: 16 });
     tray = new electron_1.Tray(resizedIcon);
     var contextMenu = electron_1.Menu.buildFromTemplate([
         { label: "열기", type: "normal", click: createWindow },
+        { type: "separator" },
+        {
+            label: "로그아웃",
+            type: "normal",
+            click: function () {
+                win.loadURL("http://localhost:3000/logout");
+            }
+        },
+        { type: "separator" },
         { label: "종료", type: "normal", click: function () { return electron_1.app.quit(); } }
     ]);
     tray.setContextMenu(contextMenu);
-    createWindow();
 });
 electron_1.app.on("window-all-closed", function () {
     if (process.platform !== "darwin") {

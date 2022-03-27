@@ -46,21 +46,32 @@ function createWindow() {
         win.loadFile(path.join(__dirname, "../build/index.html"));
     }
 
+    return win;
+
     // const icon = nativeImage.createFromPath(path.join(__dirname, "ICON_PATH"));
 
     // app.dock.setIcon(icon);
 }
 
 app.whenReady().then(() => {
+    const win = createWindow();
     const icon = nativeImage.createFromPath(path.join(__dirname, "assets/icons/notification_32x32.png"));
     const resizedIcon = icon.resize({ width: 16, height: 16 });
     tray = new Tray(resizedIcon);
     const contextMenu = Menu.buildFromTemplate([
         { label: "열기", type: "normal", click: createWindow },
+        { type: "separator" },
+        {
+            label: "로그아웃",
+            type: "normal",
+            click: () => {
+                win.loadURL("http://localhost:3000/logout");
+            }
+        },
+        { type: "separator" },
         { label: "종료", type: "normal", click: () => app.quit() }
     ]);
     tray.setContextMenu(contextMenu);
-    createWindow();
 });
 
 app.on("window-all-closed", () => {
