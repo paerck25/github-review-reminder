@@ -12,13 +12,13 @@ const rotate360 = keyframes`
 const LoadingSpinner = styled.div`
     animation: ${rotate360} 1s linear infinite;
     transform: translateZ(0);
-    border-top: 8px solid #808ea0;
-    border-right: 8px solid #808ea0;
-    border-bottom: 8px solid #808ea0;
-    border-left: 8px solid #24292f;
+    border-top: 6px solid #808ea0;
+    border-right: 6px solid #808ea0;
+    border-bottom: 6px solid #808ea0;
+    border-left: 6px solid #24292f;
     background: transparent;
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
 `;
 

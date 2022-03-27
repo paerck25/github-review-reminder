@@ -2,22 +2,19 @@ import React from "react";
 import styled from "styled-components";
 import { UserProfile } from "../github-api/types";
 import { ReactComponent as GithubLogo } from "../assets/icons/github_logo_light.svg";
-const electron = window.require("electron");
+import { openBrowser } from "../utils/utils";
 
 interface HeaderProps {
     userProfile: UserProfile;
 }
 
 const Header = ({ userProfile }: HeaderProps) => {
-    const openExternal = (href: string) => {
-        electron.shell.openExternal(href);
-    };
     return (
         <Container>
-            <GithubLogo onClick={() => openExternal(`https://github.com`)} />
+            <GithubLogo onClick={openBrowser.bind(null, `https://github.com`)} />
             <UserAvatar
                 src={userProfile.avatar_url}
-                onClick={() => openExternal(`https://github.com/${userProfile.login}`)}
+                onClick={openBrowser.bind(null, `https://github.com/${userProfile.login}`)}
             />
         </Container>
     );

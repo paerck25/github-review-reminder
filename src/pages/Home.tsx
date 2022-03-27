@@ -1,71 +1,81 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import Header from "../components/Header";
 import ListItem from "../components/ListItem";
-import LoadingSpinner from "../components/LoadingSpinner";
-import { getMyOrganizationList, getMyUserProfile } from "../github-api";
-import { UserProfile } from "../github-api/types";
+import { fetchPullRequest, getMyUserProfile } from "../github-api";
+
+export interface Review {
+    org_name: string;
+    org_avater: string;
+    repo_name: string;
+    pr_url: string;
+    pr_title: string;
+    pr_body: string;
+    pr_author: string;
+    pr_updated_at: string;
+}
 
 const Home = () => {
-    const { data, isLoading, error, isFetching } = useQuery("myUserProfile", getMyUserProfile);
-    const {
-        data: orgData,
-        isLoading: orgLoading,
-        error: orgError,
-        isFetching: orgIsFetching
-    } = useQuery("myOrganizations", getMyOrganizationList);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const { data: myUserProfile } = useQuery("myUserProfile", getMyUserProfile);
+
+    const { data: pullRequests } = useQuery("pullRequests", fetchPullRequest);
 
     useEffect(() => {
-        console.log(orgError);
-        console.log(orgData);
-    }, [orgData, orgError]);
+        if (pullRequests) {
+            const my_reviews: Review[] = [];
+            pullRequests.forEach(pr => {
+                const isWating = pr.requested_reviewers.find(reviewr => {
+                    return reviewr.login === myUserProfile?.login;
+                });
+                if (isWating) {
+                    my_reviews.push({
+                        org_name: pr.base.repo.owner.login,
+                        org_avater: pr.base.repo.owner.avatar_url,
+                        repo_name: pr.base.repo.full_name,
+                        pr_title: pr.title,
+                        pr_body: pr.body,
+                        pr_author: pr.user.login,
+                        pr_updated_at: pr.updated_at,
+                        pr_url: pr.html_url
+                    });
+                }
+            });
+            setReviews(my_reviews);
+        }
+    }, [pullRequests, myUserProfile]);
 
-    if (isLoading) {
-        return (
-            <CenterContainer>
-                <LoadingSpinner />
-            </CenterContainer>
-        );
-    }
+    const renderReviews = useMemo(
+        () =>
+            reviews.map((review, index) => {
+                return <ListItem key={index} review={review} />;
+            }),
+        [reviews]
+    );
 
     return (
-        <RootContainer>
-            <Header userProfile={data as UserProfile} />
-            <BodyContainer>
-                {orgData?.map(org => {
-                    return <ListItem key={org.id} organization={org} />;
-                })}
-                {orgData?.map(org => {
-                    return <ListItem key={org.id} organization={org} />;
-                })}
-                {orgData?.map(org => {
-                    return <ListItem key={org.id} organization={org} />;
-                })}
-                {orgData?.map(org => {
-                    return <ListItem key={org.id} organization={org} />;
-                })}
-            </BodyContainer>
-        </RootContainer>
+        <Container>
+            {renderReviews.length !== 0 ? (
+                renderReviews
+            ) : (
+                <CenterContainer>리뷰 요청이 존재하지 않습니다.</CenterContainer>
+            )}
+        </Container>
     );
 };
 
 export default Home;
 
+const Container = styled.div`
+    width: 100%;
+    height: 100%;
+`;
+
 const CenterContainer = styled.div`
     width: 100%;
-    height: 100vh;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-`;
-
-const RootContainer = styled.div`
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-`;
-
-const BodyContainer = styled.div`
-    padding: 16px;
+    color: #57606a;
 `;

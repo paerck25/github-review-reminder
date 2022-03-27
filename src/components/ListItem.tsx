@@ -1,20 +1,32 @@
 import React from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import styled from "styled-components";
-import { OrganizaionInfo } from "../github-api/types";
+import { Review } from "../pages/Home";
+import { convertDate, openBrowser } from "../utils/utils";
 
 interface ListItemProps {
-    organization: OrganizaionInfo;
+    review: Review;
 }
 
-const ListItem = ({ organization }: ListItemProps) => {
+const ListItem = ({ review }: ListItemProps) => {
     return (
         <Container>
-            <IconWrap>
-                <Icon src={organization.avatar_url} alt="icon" />
+            <IconWrap onClick={openBrowser.bind(null, `https://github.com/${review.org_name}`)}>
+                <Icon src={review.org_avater} alt="icon" />
             </IconWrap>
             <CardWrap>
-                <Title>{organization.login}</Title>
-                <Card></Card>
+                <Title onClick={openBrowser.bind(null, `https://github.com/${review.repo_name}`)}>
+                    {review.repo_name}
+                </Title>
+                <CardSubTitle>{` - opend by ${review.pr_author}`}</CardSubTitle>
+                <Card onClick={openBrowser.bind(null, review.pr_url)}>
+                    <CardTitle>{review.pr_title}</CardTitle>
+                    <CardDescription>
+                        <ReactMarkdown children={review.pr_body} remarkPlugins={[remarkGfm]} />
+                    </CardDescription>
+                    <CardSubDescription>{`Updated ${convertDate(review.pr_updated_at)}`}</CardSubDescription>
+                </Card>
             </CardWrap>
         </Container>
     );
@@ -30,6 +42,7 @@ const Container = styled.div`
 
 const IconWrap = styled.span`
     margin-right: 8px;
+    cursor: pointer;
 `;
 
 const Icon = styled.img`
@@ -39,10 +52,11 @@ const Icon = styled.img`
     box-shadow: 0 0 0 1px rgba(27, 31, 36, 0.15);
 `;
 
-const Title = styled.div`
+const Title = styled.span`
     font-size: 14px;
     line-height: 32px;
     color: #24292f;
+    cursor: pointer;
 `;
 
 const CardWrap = styled.div`
@@ -55,4 +69,32 @@ const Card = styled.div`
     border: 1px solid #d0d7de;
     border-radius: 6px;
     padding: 16px;
+    cursor: pointer;
+`;
+
+const CardTitle = styled.div`
+    font-size: 16px;
+    color: #24292f;
+    font-weight: bold;
+`;
+
+const CardSubTitle = styled.span`
+    font-size: 12px;
+    color: #57606a;
+`;
+
+const CardDescription = styled.div`
+    margin-top: 8px;
+    font-size: 14px;
+    color: #57606a;
+
+    & li {
+        display: block;
+    }
+`;
+
+const CardSubDescription = styled.div`
+    margin-top: 8px;
+    font-size: 12px;
+    color: #57606a;
 `;
