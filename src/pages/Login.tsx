@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { GET_CODE_URL } from "../constant";
 import { ReactComponent as GithubLogo } from "../assets/icons/github_logo_light.svg";
 import Carousel from "../components/Carousel";
 import ImageA from "../assets/images/org_access.png";
+import { useNavigate } from "react-router-dom";
+import { getMyUserProfile } from "../github-api";
 
 const Login = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            getMyUserProfile()
+                .then(res => {
+                    navigate("/home", { replace: true });
+                })
+                .catch(e => {
+                    console.log(e.message);
+                    localStorage.removeItem("token");
+                });
+        }
+    }, []);
+
     const githubLogin = () => {
         window.location.href = GET_CODE_URL;
     };
