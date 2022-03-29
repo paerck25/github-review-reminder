@@ -68,7 +68,13 @@ electron_1.ipcMain.on("login", function (event, arg) { return __awaiter(void 0, 
                 }
             });
         }); };
-        win = new electron_1.BrowserWindow({ width: 600, height: 500 });
+        win = new electron_1.BrowserWindow({
+            width: 600,
+            height: 500,
+            webPreferences: {
+                devTools: false
+            }
+        });
         win.loadURL(arg.getCodeUrl);
         win.webContents.on("will-navigate", function (e, next) { return __awaiter(void 0, void 0, void 0, function () {
             var token;
@@ -120,7 +126,8 @@ function createWindow() {
         height: 600,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            devTools: false
         }
     });
     if (isDev) {
