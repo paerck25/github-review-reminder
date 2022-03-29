@@ -27,7 +27,13 @@ ipcMain.on("login", async (event, arg) => {
         }
         return null;
     };
-    const win = new BrowserWindow({ width: 600, height: 500 });
+    const win = new BrowserWindow({
+        width: 600,
+        height: 500,
+        webPreferences: {
+            devTools: false
+        }
+    });
     win.loadURL(arg.getCodeUrl);
     win.webContents.on("will-navigate", async (e, next) => {
         const token = await getAccessToken(next);
@@ -60,7 +66,8 @@ function createWindow() {
         height: 600,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            devTools: false
         }
     });
     if (isDev) {
