@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
@@ -16,13 +16,26 @@ const GlobalStyle = createGlobalStyle`
     body {
         background-color: #F6F8FA;
     }
+
+    body::-webkit-scrollbar {
+        width: 5px; 
+    }
+
+    body::-webkit-scrollbar-thumb {
+        background: #57606a; 
+        border-radius: 10px;
+    }
+
+    body::-webkit-scrollbar-track {
+        display: none;
+    }
 `;
 
 ReactDOM.render(
-    <BrowserRouter>
+    <HashRouter>
         <GlobalStyle />
         <App />
-    </BrowserRouter>,
+    </HashRouter>,
     document.getElementById("root")
 );
 
