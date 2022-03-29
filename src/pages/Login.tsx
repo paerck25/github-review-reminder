@@ -1,31 +1,18 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
-import { GET_CODE_URL } from "../constant";
+import { CLIENT_ID, CLIENT_SECRET, GET_CODE_URL } from "../constant";
 import { ReactComponent as GithubLogo } from "../assets/icons/github_logo_light.svg";
 import Carousel from "../components/Carousel";
 import ImageA from "../assets/images/org_access.png";
-import { useNavigate } from "react-router-dom";
-import { getMyUserProfile } from "../github-api";
+const electron = window.require("electron");
 
 const Login = () => {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            getMyUserProfile()
-                .then(res => {
-                    navigate("/home", { replace: true });
-                })
-                .catch(e => {
-                    console.log(e.message);
-                    localStorage.removeItem("token");
-                });
-        }
-    }, []);
-
     const githubLogin = () => {
-        window.location.href = GET_CODE_URL;
+        electron.ipcRenderer.send("login", {
+            getCodeUrl: GET_CODE_URL,
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET
+        });
     };
 
     return (

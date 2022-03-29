@@ -5,19 +5,44 @@ import axios from "axios";
 
 let tray;
 
-ipcMain.on("auth", async (event, arg) => {
-    const { data } = await axios.post(
-        "https://github.com/login/oauth/access_token",
-        {
-            ...arg
-        },
-        {
-            headers: {
-                Accept: "application/json"
-            }
+ipcMain.on("login", async (event, arg) => {
+    const REDIRECT_URL = "http://localhost/auth?code=";
+    const getAccessToken = async (url: string) => {
+        if (url.includes(REDIRECT_URL)) {
+            const code = url.replace(REDIRECT_URL, "");
+            const { data } = await axios.post(
+                "https://github.com/login/oauth/access_token",
+                {
+                    code: code,
+                    client_id: arg.client_id,
+                    client_secret: arg.client_secret
+                },
+                {
+                    headers: {
+                        Accept: "application/json"
+                    }
+                }
+            );
+            return data;
         }
-    );
-    event.reply("access_code", data);
+        return null;
+    };
+    const win = new BrowserWindow({ width: 600, height: 500 });
+    win.loadURL(arg.getCodeUrl);
+    win.webContents.on("will-navigate", async (e, next) => {
+        const token = await getAccessToken(next);
+        if (token) {
+            event.reply("login-reply", token);
+            win.destroy();
+        }
+    });
+    win.webContents.on("did-redirect-navigation", async (e, url) => {
+        const token = await getAccessToken(url);
+        if (token) {
+            event.reply("login-reply", token);
+            win.destroy();
+        }
+    });
 });
 
 ipcMain.on("review_notification", async (event, arg) => {
@@ -31,26 +56,21 @@ ipcMain.on("review_notification", async (event, arg) => {
 
 function createWindow() {
     const win = new BrowserWindow({
+        width: 500,
+        height: 600,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         }
     });
-
-    const startUrl = "http://localhost:3000";
-
     if (isDev) {
-        win.loadURL(startUrl);
+        win.loadURL("http://localhost:3000");
         win.webContents.openDevTools();
     } else {
         win.loadFile(path.join(__dirname, "../build/index.html"));
     }
 
     return win;
-
-    // const icon = nativeImage.createFromPath(path.join(__dirname, "ICON_PATH"));
-
-    // app.dock.setIcon(icon);
 }
 
 app.whenReady().then(() => {
@@ -65,7 +85,7 @@ app.whenReady().then(() => {
             label: "로그아웃",
             type: "normal",
             click: () => {
-                win.loadURL("http://localhost:3000/logout");
+                win.webContents.postMessage("tray-menu-logout", "logut");
             }
         },
         { type: "separator" },

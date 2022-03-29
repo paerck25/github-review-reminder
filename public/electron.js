@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -52,20 +41,66 @@ var isDev = require("electron-is-dev");
 var path = require("path");
 var axios_1 = require("axios");
 var tray;
-electron_1.ipcMain.on("auth", function (event, arg) { return __awaiter(void 0, void 0, void 0, function () {
-    var data;
+electron_1.ipcMain.on("login", function (event, arg) { return __awaiter(void 0, void 0, void 0, function () {
+    var REDIRECT_URL, getAccessToken, win;
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, axios_1["default"].post("https://github.com/login/oauth/access_token", __assign({}, arg), {
-                    headers: {
-                        Accept: "application/json"
-                    }
-                })];
-            case 1:
-                data = (_a.sent()).data;
-                event.reply("access_code", data);
-                return [2 /*return*/];
-        }
+        REDIRECT_URL = "http://localhost/auth?code=";
+        getAccessToken = function (url) { return __awaiter(void 0, void 0, void 0, function () {
+            var code, data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!url.includes(REDIRECT_URL)) return [3 /*break*/, 2];
+                        code = url.replace(REDIRECT_URL, "");
+                        return [4 /*yield*/, axios_1["default"].post("https://github.com/login/oauth/access_token", {
+                                code: code,
+                                client_id: arg.client_id,
+                                client_secret: arg.client_secret
+                            }, {
+                                headers: {
+                                    Accept: "application/json"
+                                }
+                            })];
+                    case 1:
+                        data = (_a.sent()).data;
+                        return [2 /*return*/, data];
+                    case 2: return [2 /*return*/, null];
+                }
+            });
+        }); };
+        win = new electron_1.BrowserWindow({ width: 600, height: 500 });
+        win.loadURL(arg.getCodeUrl);
+        win.webContents.on("will-navigate", function (e, next) { return __awaiter(void 0, void 0, void 0, function () {
+            var token;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, getAccessToken(next)];
+                    case 1:
+                        token = _a.sent();
+                        if (token) {
+                            event.reply("login-reply", token);
+                            win.destroy();
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        win.webContents.on("did-redirect-navigation", function (e, url) { return __awaiter(void 0, void 0, void 0, function () {
+            var token;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, getAccessToken(url)];
+                    case 1:
+                        token = _a.sent();
+                        if (token) {
+                            event.reply("login-reply", token);
+                            win.destroy();
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        return [2 /*return*/];
     });
 }); });
 electron_1.ipcMain.on("review_notification", function (event, arg) { return __awaiter(void 0, void 0, void 0, function () {
@@ -81,22 +116,21 @@ electron_1.ipcMain.on("review_notification", function (event, arg) { return __aw
 }); });
 function createWindow() {
     var win = new electron_1.BrowserWindow({
+        width: 500,
+        height: 600,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         }
     });
-    var startUrl = "http://localhost:3000";
     if (isDev) {
-        win.loadURL(startUrl);
+        win.loadURL("http://localhost:3000");
         win.webContents.openDevTools();
     }
     else {
         win.loadFile(path.join(__dirname, "../build/index.html"));
     }
     return win;
-    // const icon = nativeImage.createFromPath(path.join(__dirname, "ICON_PATH"));
-    // app.dock.setIcon(icon);
 }
 electron_1.app.whenReady().then(function () {
     var win = createWindow();
@@ -110,7 +144,7 @@ electron_1.app.whenReady().then(function () {
             label: "로그아웃",
             type: "normal",
             click: function () {
-                win.loadURL("http://localhost:3000/logout");
+                win.webContents.postMessage("tray-menu-logout", "logut");
             }
         },
         { type: "separator" },

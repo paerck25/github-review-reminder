@@ -33,3 +33,9 @@ export type PullRequest = {
     requested_reviewers: UserProfile[];
     updated_at: string;
 };
+
+export type AccessToken = {
+    access_token: string;
+    token_type: string;
+    scope?: string;
+};
