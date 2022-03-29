@@ -15,7 +15,13 @@
             "buildResources": "build/"
         },
         "mac": {
-            "target": "dmg"
+            "target": {
+                "target": "default",
+                "arch": [
+                    "x64",
+                    "arm64"
+                ]
+            }
         },
         "win": {
             "target": "nsis"
