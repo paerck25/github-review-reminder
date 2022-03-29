@@ -86,7 +86,7 @@
         "@types/react-query": "^1.2.9",
         "@types/styled-components": "^5.1.16",
         "concurrently": "^6.4.0",
-        "electron": "^16.0.4",
+        "electron": "^17.1.2",
         "electron-builder": "^22.14.13",
         "wait-on": "^6.0.0"
     },
