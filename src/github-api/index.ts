@@ -1,27 +1,14 @@
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
+import axiosInstance from "./axios";
 import { OrganizaionInfo, PullRequest, Repository, UserProfile } from "./types";
 
-const BASE_URL = "https://api.github.com";
-
 const _apiGet = async (endpoint: string, config?: AxiosRequestConfig) => {
-    const token = localStorage.getItem("token");
-    const { data } = await axios.get(BASE_URL + endpoint, {
-        headers: {
-            Authorization: `token ${token}`
-        },
-        ...config
-    });
+    const { data } = await axiosInstance.get(endpoint, config);
     return data;
 };
 
 const _apiPost = async (endpoint: string, config?: AxiosRequestConfig) => {
-    const token = localStorage.getItem("token");
-    const { data } = await axios.post(BASE_URL + endpoint, {
-        headers: {
-            Authorization: `token ${token}`
-        },
-        ...config
-    });
+    const { data } = await axiosInstance.post(endpoint, config);
     return data;
 };
 
