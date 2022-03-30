@@ -8,6 +8,8 @@
 
 -   애플 개발자 서명이 되지 않은 관계로, ctrl + 좌클릭 - 열기 로 실행시켜야 실행이 됩니다.
 
+-   윈도우는 추후 테스트 후 업로드 예정입니다
+
 [다운로드-MacOs]
 
 [다운로드-macos]: https://drive.google.com/file/d/1fGTqmWlMa3es2hF4N7j4YRVbnyIkOivH/view?usp=sharing
