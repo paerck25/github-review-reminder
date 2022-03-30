@@ -31,6 +31,8 @@
         }
     },
     "dependencies": {
+        "@sentry/react": "^6.19.3",
+        "@sentry/tracing": "^6.19.3",
         "@types/jest": "^26.0.15",
         "@types/node": "^12.0.0",
         "@types/react": "^17.0.0",

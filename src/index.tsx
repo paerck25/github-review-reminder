@@ -4,6 +4,8 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { HashRouter } from "react-router-dom";
 import { createGlobalStyle } from "styled-components";
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
 
 const GlobalStyle = createGlobalStyle`
     *   {
@@ -30,6 +32,12 @@ const GlobalStyle = createGlobalStyle`
         display: none;
     }
 `;
+
+Sentry.init({
+    dsn: "https://a3a4b2d1dadc4114a3a21e736670f07b@o1182893.ingest.sentry.io/6299873",
+    integrations: [new BrowserTracing()],
+    tracesSampleRate: 1.0
+});
 
 ReactDOM.render(
     <HashRouter>
