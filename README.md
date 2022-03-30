@@ -12,4 +12,4 @@
 
 [다운로드-MacOs]
 
-[다운로드-macos]: https://drive.google.com/file/d/1fGTqmWlMa3es2hF4N7j4YRVbnyIkOivH/view?usp=sharing
+[다운로드-macos]: https://drive.google.com/file/d/1z2V6FElbgY59Nq86ExlstdGmMrfIZpAv/view?usp=sharing
