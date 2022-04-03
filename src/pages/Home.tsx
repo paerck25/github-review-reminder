@@ -20,8 +20,9 @@ export interface Review {
 
 const Home = () => {
     const [reviews, setReviews] = useState<Review[] | null>(null);
+    const [isRefetching, setIsRefetching] = useState(false);
     const { data: myUserProfile } = useQuery("myUserProfile", getMyUserProfile);
-    const { refetch, isRefetching } = useQuery("pullRequests", fetchPullRequest, {
+    const { refetch } = useQuery("pullRequests", fetchPullRequest, {
         onSuccess: pullRequests => {
             if (pullRequests) {
                 const my_reviews: Review[] = [];
@@ -52,7 +53,10 @@ const Home = () => {
     });
 
     const onClickRefetch = () => {
-        refetch();
+        setIsRefetching(true);
+        refetch().finally(() => {
+            setIsRefetching(false);
+        });
     };
 
     const sendNotification = useThrottle(() => {
