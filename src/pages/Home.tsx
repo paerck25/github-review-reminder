@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import ListItem from "../components/ListItem";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { fetchPullRequest, getMyUserProfile } from "../github-api";
 import useThrottle from "../hooks/useThrottle";
 const electron = window.require("electron");
@@ -20,7 +21,7 @@ export interface Review {
 const Home = () => {
     const [reviews, setReviews] = useState<Review[] | null>(null);
     const { data: myUserProfile } = useQuery("myUserProfile", getMyUserProfile);
-    const { refetch } = useQuery("pullRequests", fetchPullRequest, {
+    const { refetch, isRefetching } = useQuery("pullRequests", fetchPullRequest, {
         onSuccess: pullRequests => {
             if (pullRequests) {
                 const my_reviews: Review[] = [];
@@ -50,6 +51,10 @@ const Home = () => {
         refetchIntervalInBackground: true
     });
 
+    const onClickRefetch = () => {
+        refetch();
+    };
+
     const sendNotification = useThrottle(() => {
         electron.ipcRenderer.send("review_notification", { review_count: reviews?.length || 0 });
     }, 300000);
@@ -58,28 +63,28 @@ const Home = () => {
         if (reviews) sendNotification();
     }, [reviews]);
 
-    const renderReviews = useMemo(
-        () =>
-            reviews?.map((review, index) => {
-                return <ListItem key={index} review={review} />;
-            }) || [],
-        [reviews]
-    );
-
-    const onClickRefetch = () => {
-        refetch();
-    };
+    const renderReviews = useMemo(() => {
+        if (isRefetching) {
+            return (
+                <CenterContainer>
+                    <LoadingSpinner />
+                </CenterContainer>
+            );
+        }
+        if (!reviews || reviews?.length === 0) {
+            return <CenterContainer>리뷰 요청이 존재하지 않습니다.</CenterContainer>;
+        }
+        return reviews.map((review, index) => {
+            return <ListItem key={index} review={review} />;
+        });
+    }, [reviews, isRefetching]);
 
     return (
         <Container>
             <Header>
-                요청 {renderReviews.length} 건<Refresh onClick={onClickRefetch}>새로고침</Refresh>
+                요청 {reviews?.length || 0} 건<Refresh onClick={onClickRefetch}>새로고침</Refresh>
             </Header>
-            {renderReviews.length !== 0 ? (
-                renderReviews
-            ) : (
-                <CenterContainer>리뷰 요청이 존재하지 않습니다.</CenterContainer>
-            )}
+            {renderReviews}
         </Container>
     );
 };
