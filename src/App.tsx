@@ -6,6 +6,8 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import { getMyUserProfile } from "./github-api";
 import useElectronEvent from "./hooks/useElectronEvent";
 import Router from "./Router";
+import * as Sentry from "@sentry/react";
+import FallbackError from "./components/FallbackError";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -38,14 +40,16 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <Suspense
-                fallback={
-                    <CenterContainer>
-                        <LoadingSpinner />
-                    </CenterContainer>
-                }>
-                <Router />
-            </Suspense>
+            <Sentry.ErrorBoundary fallback={<FallbackError />}>
+                <Suspense
+                    fallback={
+                        <CenterContainer>
+                            <LoadingSpinner />
+                        </CenterContainer>
+                    }>
+                    <Router />
+                </Suspense>
+            </Sentry.ErrorBoundary>
         </QueryClientProvider>
     );
 }
