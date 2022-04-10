@@ -4,6 +4,7 @@ import * as path from "path";
 import axios from "axios";
 
 let tray;
+let mainWindow: BrowserWindow;
 
 ipcMain.on("login", async (event, arg) => {
     const REDIRECT_URL = "http://localhost/auth?code=";
@@ -61,7 +62,7 @@ ipcMain.on("review_notification", async (event, arg) => {
 });
 
 function createWindow() {
-    const win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 500,
         height: 600,
         webPreferences: {
@@ -69,19 +70,34 @@ function createWindow() {
             contextIsolation: false,
             devTools: isDev
         }
+        // icon: path.join(__dirname, "assets/icons/icon_frame2.png")
     });
-    if (isDev) {
-        win.loadURL("http://localhost:3000");
-        win.webContents.openDevTools();
-    } else {
-        win.loadFile(path.join(__dirname, "../build/index.html"));
-    }
 
-    return win;
+    var isAppQuitting = false;
+
+    app.on("before-quit", function (evt) {
+        isAppQuitting = true;
+    });
+
+    mainWindow.on("close", function (evt) {
+        if (!isAppQuitting) {
+            evt.preventDefault();
+            mainWindow.hide();
+        }
+    });
+
+    // app.dock.setIcon(path.join(__dirname, "assets/icons/icon_frame2.png"));
+
+    if (isDev) {
+        mainWindow.loadURL("http://localhost:3000");
+        mainWindow.webContents.openDevTools();
+    } else {
+        mainWindow.loadFile(path.join(__dirname, "../build/index.html"));
+    }
 }
 
 app.whenReady().then(() => {
-    const win = createWindow();
+    createWindow();
     const icon = nativeImage.createFromPath(path.join(__dirname, "assets/icons/notification_32x32.png"));
     const resizedIcon = icon.resize({ width: 16, height: 16 });
     tray = new Tray(resizedIcon);
@@ -92,7 +108,7 @@ app.whenReady().then(() => {
             label: "로그아웃",
             type: "normal",
             click: () => {
-                win.webContents.postMessage("tray-menu-logout", "logut");
+                mainWindow.webContents.postMessage("tray-menu-logout", "logut");
             }
         },
         { type: "separator" },
@@ -108,7 +124,9 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
+    if (mainWindow === null) {
         createWindow();
+    } else {
+        mainWindow.show();
     }
 });

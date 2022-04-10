@@ -41,6 +41,7 @@ var isDev = require("electron-is-dev");
 var path = require("path");
 var axios_1 = require("axios");
 var tray;
+var mainWindow;
 electron_1.ipcMain.on("login", function (event, arg) { return __awaiter(void 0, void 0, void 0, function () {
     var REDIRECT_URL, getAccessToken, win;
     return __generator(this, function (_a) {
@@ -121,7 +122,7 @@ electron_1.ipcMain.on("review_notification", function (event, arg) { return __aw
     });
 }); });
 function createWindow() {
-    var win = new electron_1.BrowserWindow({
+    mainWindow = new electron_1.BrowserWindow({
         width: 500,
         height: 600,
         webPreferences: {
@@ -129,18 +130,29 @@ function createWindow() {
             contextIsolation: false,
             devTools: isDev
         }
+        // icon: path.join(__dirname, "assets/icons/icon_frame2.png")
     });
+    var isAppQuitting = false;
+    electron_1.app.on("before-quit", function (evt) {
+        isAppQuitting = true;
+    });
+    mainWindow.on("close", function (evt) {
+        if (!isAppQuitting) {
+            evt.preventDefault();
+            mainWindow.hide();
+        }
+    });
+    // app.dock.setIcon(path.join(__dirname, "assets/icons/icon_frame2.png"));
     if (isDev) {
-        win.loadURL("http://localhost:3000");
-        win.webContents.openDevTools();
+        mainWindow.loadURL("http://localhost:3000");
+        mainWindow.webContents.openDevTools();
     }
     else {
-        win.loadFile(path.join(__dirname, "../build/index.html"));
+        mainWindow.loadFile(path.join(__dirname, "../build/index.html"));
     }
-    return win;
 }
 electron_1.app.whenReady().then(function () {
-    var win = createWindow();
+    createWindow();
     var icon = electron_1.nativeImage.createFromPath(path.join(__dirname, "assets/icons/notification_32x32.png"));
     var resizedIcon = icon.resize({ width: 16, height: 16 });
     tray = new electron_1.Tray(resizedIcon);
@@ -151,7 +163,7 @@ electron_1.app.whenReady().then(function () {
             label: "로그아웃",
             type: "normal",
             click: function () {
-                win.webContents.postMessage("tray-menu-logout", "logut");
+                mainWindow.webContents.postMessage("tray-menu-logout", "logut");
             }
         },
         { type: "separator" },
@@ -165,7 +177,10 @@ electron_1.app.on("window-all-closed", function () {
     }
 });
 electron_1.app.on("activate", function () {
-    if (electron_1.BrowserWindow.getAllWindows().length === 0) {
+    if (mainWindow === null) {
         createWindow();
+    }
+    else {
+        mainWindow.show();
     }
 });

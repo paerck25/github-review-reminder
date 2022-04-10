@@ -1,6 +1,6 @@
 {
     "name": "github-review-reminder",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "private": true,
     "main": "public/electron.js",
     "homepage": "./",
@@ -89,8 +89,7 @@
         "@types/styled-components": "^5.1.16",
         "concurrently": "^6.4.0",
         "electron": "^17.1.2",
-        "electron-builder": "^22.14.13",
+        "electron-builder": "^23.0.3",
         "wait-on": "^6.0.0"
-    },
-    "proxy": "http://localhost:4000"
+    }
 }
