@@ -11,4 +11,4 @@
 -   윈도우는 추후 테스트 후 업로드 예정입니다
 -   [다운로드-MacOS]
 
-[다운로드-macos]: https://drive.google.com/file/d/1z2V6FElbgY59Nq86ExlstdGmMrfIZpAv/view?usp=sharing
+[다운로드-macos]: https://drive.google.com/file/d/1C8kqhACGZll16nTz4Dm1db7QopBC1WK7/view?usp=sharing
