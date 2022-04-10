@@ -3,8 +3,7 @@ import { useQuery } from "react-query";
 import styled from "styled-components";
 import ListItem from "../components/ListItem";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { fetchPullRequest, getMyUserProfile } from "../github-api";
-import useThrottle from "../hooks/useThrottle";
+import { fetchPullRequest, fetchMyUserProfile } from "../github-api";
 const electron = window.require("electron");
 
 export interface Review {
@@ -19,52 +18,56 @@ export interface Review {
 }
 
 const Home = () => {
-    const [reviews, setReviews] = useState<Review[] | null>(null);
     const [isRefetching, setIsRefetching] = useState(false);
-    const { data: myUserProfile } = useQuery("myUserProfile", getMyUserProfile);
-    const { refetch } = useQuery("pullRequests", fetchPullRequest, {
-        onSuccess: pullRequests => {
-            if (pullRequests) {
-                const my_reviews: Review[] = [];
-                pullRequests.forEach(pr => {
-                    const isWating = pr.requested_reviewers.find(reviewr => {
-                        return reviewr.login === myUserProfile?.login;
-                    });
-                    if (isWating) {
-                        my_reviews.push({
-                            org_name: pr.base.repo.owner.login,
-                            org_avater: pr.base.repo.owner.avatar_url,
-                            repo_name: pr.base.repo.full_name,
-                            pr_title: pr.title,
-                            pr_body: pr.body,
-                            pr_author: pr.user.login,
-                            pr_updated_at: pr.updated_at,
-                            pr_url: pr.html_url
-                        });
-                    }
-                });
-                setReviews(my_reviews);
-            }
-        },
+    const { data: myUserProfile } = useQuery("myUserProfile", fetchMyUserProfile);
+    const { data: reviews, refetch } = useQuery("pullRequests", fetchPullRequest, {
         enabled: !!myUserProfile,
-        refetchInterval: 5000,
+        refetchInterval: 10000,
         refetchOnWindowFocus: true,
-        refetchIntervalInBackground: true
+        refetchIntervalInBackground: true,
+        select: data => {
+            const my_reviews: Review[] = [];
+            data.forEach(pr => {
+                const isWating = pr.requested_reviewers.find(reviewr => {
+                    return reviewr.login === myUserProfile?.login;
+                });
+                if (isWating) {
+                    my_reviews.push({
+                        org_name: pr.base.repo.owner.login,
+                        org_avater: pr.base.repo.owner.avatar_url,
+                        repo_name: pr.base.repo.full_name,
+                        pr_title: pr.title,
+                        pr_body: pr.body,
+                        pr_author: pr.user.login,
+                        pr_updated_at: pr.updated_at,
+                        pr_url: pr.html_url
+                    });
+                }
+            });
+            return my_reviews;
+        }
     });
 
     const onClickRefetch = () => {
         setIsRefetching(true);
         refetch().finally(() => {
             setIsRefetching(false);
+            sendNotification();
         });
     };
 
-    const sendNotification = useThrottle(() => {
+    const sendNotification = () => {
         electron.ipcRenderer.send("review_notification", { review_count: reviews?.length || 0 });
-    }, 300000);
+    };
 
     useEffect(() => {
-        if (reviews) sendNotification();
+        sendNotification();
+        const intervalId = setInterval(() => {
+            sendNotification();
+        }, 300000);
+        return () => {
+            clearInterval(intervalId);
+        };
     }, [reviews]);
 
     const renderReviews = useMemo(() => {
