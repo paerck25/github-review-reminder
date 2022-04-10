@@ -12,20 +12,20 @@ const _apiPost = async (endpoint: string, config?: AxiosRequestConfig) => {
     return data;
 };
 
-export const getMyUserProfile = async (): Promise<UserProfile> => {
+export const fetchMyUserProfile = async (): Promise<UserProfile> => {
     return await _apiGet("/user");
 };
 
-export const getMyOrganizationList = async (): Promise<OrganizaionInfo[]> => {
+export const fetchMyOrganizationList = async (): Promise<OrganizaionInfo[]> => {
     return await _apiGet("/user/orgs");
 };
 
-export const getRepositoriesByOrg = async ({ org }: { org: string }): Promise<Repository[]> => {
+export const fetchRepositoriesByOrg = async ({ org }: { org: string }): Promise<Repository[]> => {
     return await _apiGet(`/orgs/${org}/repos`);
 };
 
-export const getPullRequestsByRepo = async ({ full_name }: { full_name: string }): Promise<PullRequest[]> => {
-    return await _apiGet(`/repos/${full_name}/pulls`);
+export const fetchPullRequestsByRepo = async ({ full_name }: { full_name: string }): Promise<PullRequest[]> => {
+    return await _apiGet(`/repos/${full_name}/pulls?timestamp=${new Date().getTime()}`);
 };
 
 export const getReivewsByPull = async ({
@@ -53,11 +53,13 @@ export const getReviewersByPull = async ({
 };
 
 export const fetchPullRequest = async () => {
-    const organizations = await getMyOrganizationList();
+    const organizations = await fetchMyOrganizationList();
     const orgNames = organizations?.map(org => org.login);
-    const reposByOrg = await Promise.all(orgNames.map(name => getRepositoriesByOrg({ org: name })));
+    const reposByOrg = await Promise.all(orgNames.map(name => fetchRepositoriesByOrg({ org: name })));
     const repoFullNames = reposByOrg.flat().map(repo => repo.full_name);
-    const pullRequestsByRepo = await Promise.all(repoFullNames.map(name => getPullRequestsByRepo({ full_name: name })));
+    const pullRequestsByRepo = await Promise.all(
+        repoFullNames.map(name => fetchPullRequestsByRepo({ full_name: name }))
+    );
     const pullRequests = pullRequestsByRepo.flat();
     return pullRequests;
 };

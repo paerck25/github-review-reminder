@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import LoadingSpinner from "./components/LoadingSpinner";
-import { getMyUserProfile } from "./github-api";
+import { fetchMyUserProfile } from "./github-api";
 import useElectronEvent from "./hooks/useElectronEvent";
 import Router from "./Router";
 import * as Sentry from "@sentry/react";
@@ -24,7 +24,7 @@ function App() {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            getMyUserProfile()
+            fetchMyUserProfile()
                 .then(res => {
                     navigate("/home", { replace: true });
                 })

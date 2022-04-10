@@ -4,11 +4,11 @@ import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import Header from "../components/Header";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { getMyUserProfile } from "../github-api";
+import { fetchMyUserProfile } from "../github-api";
 import { UserProfile } from "../github-api/types";
 
 const Layout = () => {
-    const { data: userProfile } = useQuery("myUserProfile", getMyUserProfile);
+    const { data: userProfile } = useQuery("myUserProfile", fetchMyUserProfile);
 
     return (
         <RootContainer>
