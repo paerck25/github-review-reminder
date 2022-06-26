@@ -12,7 +12,12 @@ import FallbackError from "./components/FallbackError";
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            suspense: true
+            suspense: true,
+            refetchInterval: false,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            refetchOnMount: false,
+            refetchIntervalInBackground: false
         }
     }
 });
