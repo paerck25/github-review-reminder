@@ -1,14 +1,13 @@
 import React, { Suspense } from "react";
-import { useQuery } from "react-query";
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import Header from "../components/Header";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { fetchMyUserProfile } from "../github-api";
 import { UserProfile } from "../github-api/types";
+import { useMyProfile } from "../github-api/useMyProfile";
 
 const Layout = () => {
-    const { data: userProfile } = useQuery("myUserProfile", fetchMyUserProfile);
+    const { data: userProfile } = useMyProfile();
 
     return (
         <RootContainer>

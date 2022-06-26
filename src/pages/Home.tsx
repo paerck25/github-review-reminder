@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import styled from "styled-components";
 import ListItem from "../components/ListItem";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { fetchPullRequest, fetchMyUserProfile } from "../github-api";
+import { useMyProfile } from "../github-api/useMyProfile";
+import { usePullRequests } from "../github-api/usePullReuqests";
 const electron = window.require("electron");
 
 export interface Review {
@@ -19,34 +19,36 @@ export interface Review {
 
 const Home = () => {
     const [isRefetching, setIsRefetching] = useState(false);
-    const { data: myUserProfile } = useQuery("myUserProfile", fetchMyUserProfile);
-    const { data: reviews, refetch } = useQuery("pullRequests", fetchPullRequest, {
+    const { data: myUserProfile } = useMyProfile();
+
+    const { data: pullRequests, refetch } = usePullRequests({
         enabled: !!myUserProfile,
         refetchInterval: 10000,
         refetchOnWindowFocus: true,
-        refetchIntervalInBackground: true,
-        select: data => {
-            const my_reviews: Review[] = [];
-            data.forEach(pr => {
-                const isWating = pr.requested_reviewers.find(reviewr => {
-                    return reviewr.login === myUserProfile?.login;
-                });
-                if (isWating) {
-                    my_reviews.push({
-                        org_name: pr.base.repo.owner.login,
-                        org_avater: pr.base.repo.owner.avatar_url,
-                        repo_name: pr.base.repo.full_name,
-                        pr_title: pr.title,
-                        pr_body: pr.body,
-                        pr_author: pr.user.login,
-                        pr_updated_at: pr.updated_at,
-                        pr_url: pr.html_url
-                    });
-                }
-            });
-            return my_reviews;
-        }
+        refetchIntervalInBackground: true
     });
+
+    const reviews = useMemo(() => {
+        const my_reviews: Review[] = [];
+        pullRequests?.forEach(pr => {
+            const isWating = pr.requested_reviewers.find(reviewr => {
+                return reviewr.login === myUserProfile?.login;
+            });
+            if (isWating) {
+                my_reviews.push({
+                    org_name: pr.base.repo.owner.login,
+                    org_avater: pr.base.repo.owner.avatar_url,
+                    repo_name: pr.base.repo.full_name,
+                    pr_title: pr.title,
+                    pr_body: pr.body,
+                    pr_author: pr.user.login,
+                    pr_updated_at: pr.updated_at,
+                    pr_url: pr.html_url
+                });
+            }
+        });
+        return my_reviews;
+    }, [pullRequests, myUserProfile]);
 
     const onClickRefetch = () => {
         setIsRefetching(true);

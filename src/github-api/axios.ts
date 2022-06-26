@@ -11,6 +11,7 @@ axiosInstance.interceptors.request.use(config => {
     const newConfig = {
         ...config,
         headers: {
+            ...config.headers,
             Authorization: `token ${token}`
         }
     };
