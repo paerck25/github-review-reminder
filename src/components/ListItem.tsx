@@ -1,6 +1,4 @@
 import React from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import styled from "styled-components";
 import { Review } from "../pages/Home";
 import { convertDate, openBrowser } from "../utils/utils";
@@ -23,7 +21,7 @@ const ListItem = ({ review }: ListItemProps) => {
                 <Card onClick={openBrowser.bind(null, review.pr_url)}>
                     <CardTitle>{review.pr_title}</CardTitle>
                     <CardDescription>
-                        <ReactMarkdown children={review.pr_body} remarkPlugins={[remarkGfm]} />
+                        <div dangerouslySetInnerHTML={{ __html: review.pr_body }} />
                     </CardDescription>
                     <CardSubDescription>{`Updated ${convertDate(review.pr_updated_at)}`}</CardSubDescription>
                 </Card>
@@ -84,7 +82,7 @@ const CardSubTitle = styled.span`
 `;
 
 const CardDescription = styled.div`
-    margin-top: 8px;
+    margin-top: 16px;
     font-size: 14px;
     color: #57606a;
 
@@ -94,7 +92,7 @@ const CardDescription = styled.div`
 `;
 
 const CardSubDescription = styled.div`
-    margin-top: 8px;
+    margin-top: 16px;
     font-size: 12px;
     color: #57606a;
 `;

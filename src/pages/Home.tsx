@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import ListItem from "../components/ListItem";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { useMyProfile } from "../github-api/useMyProfile";
-import { usePullRequests } from "../github-api/usePullReuqests";
+import { useQueryViewer } from "../github-api/hooks/useQueryViewer";
+import { User } from "../github-api/types/graphqlTypes";
 const electron = window.require("electron");
 
 export interface Review {
@@ -19,36 +19,56 @@ export interface Review {
 
 const Home = () => {
     const [isRefetching, setIsRefetching] = useState(false);
-    const { data: myUserProfile } = useMyProfile();
 
-    const { data: pullRequests, refetch } = usePullRequests({
-        enabled: !!myUserProfile,
-        refetchInterval: 10000,
+    const { data: viewerData, refetch } = useQueryViewer({
+        staleTime: 300000,
         refetchOnWindowFocus: true,
         refetchIntervalInBackground: true
     });
 
     const reviews = useMemo(() => {
         const my_reviews: Review[] = [];
-        pullRequests?.forEach(pr => {
-            const isWating = pr.requested_reviewers.find(reviewr => {
-                return reviewr.login === myUserProfile?.login;
-            });
-            if (isWating) {
-                my_reviews.push({
-                    org_name: pr.base.repo.owner.login,
-                    org_avater: pr.base.repo.owner.avatar_url,
-                    repo_name: pr.base.repo.full_name,
-                    pr_title: pr.title,
-                    pr_body: pr.body,
-                    pr_author: pr.user.login,
-                    pr_updated_at: pr.updated_at,
-                    pr_url: pr.html_url
+        if (!viewerData) return [];
+        const { viewer } = viewerData;
+        const { organizations, login: viewerLogin } = viewer;
+        organizations?.nodes?.forEach(org => {
+            if (!org) return;
+            const { avatarUrl: orgAvatar, login: orgLogin, repositories } = org;
+            repositories?.nodes?.forEach(repo => {
+                if (!repo) return;
+                const { name: repoName, pullRequests } = repo;
+                pullRequests.nodes?.forEach(pr => {
+                    if (!pr) return;
+                    const {
+                        title: prTitle,
+                        bodyHTML: prBody,
+                        author: prAuthor,
+                        reviewRequests,
+                        updatedAt: prUpdatedAt,
+                        url: prUrl
+                    } = pr;
+                    reviewRequests?.nodes?.forEach(review => {
+                        if (!review) return;
+                        const requestedReviewer = review.requestedReviewer as User;
+                        if (!requestedReviewer) return;
+                        if (requestedReviewer.login === viewerLogin) {
+                            my_reviews.push({
+                                org_name: orgLogin,
+                                org_avater: orgAvatar,
+                                repo_name: repoName,
+                                pr_title: prTitle,
+                                pr_body: prBody,
+                                pr_author: prAuthor?.login || "null",
+                                pr_updated_at: prUpdatedAt,
+                                pr_url: prUrl
+                            });
+                        }
+                    });
                 });
-            }
+            });
         });
         return my_reviews;
-    }, [pullRequests, myUserProfile]);
+    }, [viewerData]);
 
     const onClickRefetch = () => {
         setIsRefetching(true);

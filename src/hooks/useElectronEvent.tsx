@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { AccessToken } from "../github-api/types";
+import { AccessToken } from "../github-api/types/types";
 const electron = window.require("electron");
 
 const useElectronEvent = (navigate?: NavigateFunction) => {

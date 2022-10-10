@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { UserProfile } from "../github-api/types";
+import { UserProfile } from "../github-api/types/types";
 import { ReactComponent as GithubLogo } from "../assets/icons/github_logo_light.svg";
 import { openBrowser } from "../utils/utils";
 

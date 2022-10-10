@@ -3,8 +3,8 @@ import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import Header from "../components/Header";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { UserProfile } from "../github-api/types";
-import { useMyProfile } from "../github-api/useMyProfile";
+import { UserProfile } from "../github-api/types/types";
+import { useMyProfile } from "../github-api/hooks/useMyProfile";
 
 const Layout = () => {
     const { data: userProfile } = useMyProfile();
