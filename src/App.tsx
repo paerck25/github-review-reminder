@@ -1,13 +1,13 @@
 import React, { Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { ErrorBoundary } from "@sentry/react";
 import styled from "styled-components";
 import LoadingSpinner from "./components/LoadingSpinner";
-import { fetchMyUserProfile } from "./github-api/apis";
+import FallbackError from "./components/FallbackError";
 import useElectronEvent from "./hooks/useElectronEvent";
 import Router from "./Router";
-import * as Sentry from "@sentry/react";
-import FallbackError from "./components/FallbackError";
+import { queryMyProfile } from "./github-api/apis";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -25,11 +25,10 @@ const queryClient = new QueryClient({
 function App() {
     const navigate = useNavigate();
     useElectronEvent(navigate);
-
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
-            fetchMyUserProfile()
+            queryMyProfile()
                 .then(res => {
                     navigate("/home", { replace: true });
                 })
@@ -45,7 +44,7 @@ function App() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <Sentry.ErrorBoundary fallback={<FallbackError />}>
+            <ErrorBoundary fallback={<FallbackError />}>
                 <Suspense
                     fallback={
                         <CenterContainer>
@@ -54,7 +53,7 @@ function App() {
                     }>
                     <Router />
                 </Suspense>
-            </Sentry.ErrorBoundary>
+            </ErrorBoundary>
         </QueryClientProvider>
     );
 }

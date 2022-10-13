@@ -3,15 +3,15 @@ import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import Header from "../components/Header";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { UserProfile } from "../github-api/types/types";
 import { useMyProfile } from "../github-api/hooks/useMyProfile";
+import { User } from "../github-api/types/graphqlTypes";
 
 const Layout = () => {
     const { data: userProfile } = useMyProfile();
 
     return (
         <RootContainer>
-            <Header userProfile={userProfile as UserProfile} />
+            <Header userProfile={userProfile?.viewer as User} />
             <BodyContainer>
                 <Suspense
                     fallback={

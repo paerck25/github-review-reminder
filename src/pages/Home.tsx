@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import ListItem from "../components/ListItem";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { useQueryViewer } from "../github-api/hooks/useQueryViewer";
+import { useReviews } from "../github-api/hooks/useReviews";
 import { User } from "../github-api/types/graphqlTypes";
 const electron = window.require("electron");
 
@@ -20,7 +20,7 @@ export interface Review {
 const Home = () => {
     const [isRefetching, setIsRefetching] = useState(false);
 
-    const { data: viewerData, refetch } = useQueryViewer({
+    const { data: viewerData, refetch } = useReviews({
         staleTime: 300000,
         refetchOnWindowFocus: true,
         refetchIntervalInBackground: true
@@ -70,16 +70,15 @@ const Home = () => {
         return my_reviews;
     }, [viewerData]);
 
+    const sendNotification = () => {
+        electron.ipcRenderer.send("review_notification", { review_count: reviews?.length || 0 });
+    };
+
     const onClickRefetch = () => {
         setIsRefetching(true);
         refetch().finally(() => {
             setIsRefetching(false);
-            sendNotification();
         });
-    };
-
-    const sendNotification = () => {
-        electron.ipcRenderer.send("review_notification", { review_count: reviews?.length || 0 });
     };
 
     useEffect(() => {

@@ -1,20 +1,22 @@
-import { AxiosRequestConfig } from "axios";
 import { gql } from "graphql-request";
-import axiosInstance from "./axios";
 import { graphqlRequest } from "./graphql-request";
 import { User } from "./types/graphqlTypes";
-import { UserProfile } from "./types/types";
 
-const _apiGet = async (endpoint: string, config?: AxiosRequestConfig) => {
-    const { data } = await axiosInstance.get(endpoint, config);
-    return data;
+const viewerQuery = gql`
+    query {
+        viewer {
+            login
+            name
+            avatarUrl
+        }
+    }
+`;
+
+export const queryMyProfile = async (): Promise<{ viewer: User }> => {
+    return graphqlRequest(viewerQuery);
 };
 
-export const fetchMyUserProfile = async (): Promise<UserProfile> => {
-    return await _apiGet("/user");
-};
-
-const query = gql`
+const reviewQuery = gql`
     query {
         viewer {
             login
@@ -55,6 +57,6 @@ const query = gql`
     }
 `;
 
-export const queryViewer = async (): Promise<{ viewer: User }> => {
-    return await graphqlRequest(query);
+export const queryReviews = (): Promise<{ viewer: User }> => {
+    return graphqlRequest(reviewQuery);
 };
