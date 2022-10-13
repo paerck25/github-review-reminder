@@ -1,4 +1,4 @@
-# github-review-reminder v0.1.4
+# github-review-reminder v0.1.5
 
 -   깃허브 리뷰 까먹지 않도록 알림 보내주는 macOS 어플리케이션입니다<br>
 -   나에게 리뷰 요청이 있는 풀리퀘스트만 보여줍니다.<br>
@@ -11,7 +11,7 @@
 -   윈도우는 추후 테스트 후 업로드 예정입니다
 -   [다운로드-MacOS]
 
-[다운로드-macos]: https://drive.google.com/file/d/1FX42fmCb7jqs-BVINhHjNsF2adDH5ejE/view?usp=sharing
+[다운로드-macos]: https://drive.google.com/file/d/1U5TUpo_s21_jki3cMsMGu5XYlz_ahrsI/view?usp=sharing
 
 ### development
 
